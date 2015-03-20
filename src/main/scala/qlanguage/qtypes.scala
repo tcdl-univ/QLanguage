@@ -1,4 +1,5 @@
 package qlanguage
+import scala.language.implicitConversions
 
 object BooleanResult {
   class MyBooleanLogic[T](x: Option[T], origin: T) {

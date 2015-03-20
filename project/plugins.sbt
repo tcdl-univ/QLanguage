@@ -1,4 +1,7 @@
 resolvers += "Uqbar Central" at "http://uqbar-wiki.org/mvn/releases"
+resolvers += Classpaths.sbtPluginReleases
+
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.4")
 
 addSbtPlugin("org.uqbar" % "sbt-flexible-dependencies" % "latest.integration")
 
