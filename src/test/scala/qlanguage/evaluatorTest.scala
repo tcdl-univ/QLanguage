@@ -71,6 +71,11 @@ class QEvaluatorTest extends FreeSpec with Matchers {
         Query(Minus(IntExpression(3),IntExpression(1))).evaluate() should be(ValidResult(0)) 
       }
     }
+    
+    "Lambda evaluation" - {
+      "Simple lambda expression" in {
+      }
+    }
   }
 
 }

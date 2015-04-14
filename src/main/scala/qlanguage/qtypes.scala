@@ -1,5 +1,9 @@
 package qlanguage
 import scala.language.implicitConversions
+import scala.util.parsing.input.Position
+import scala.util.parsing.input.Positional
+
+case class Message(pos: Position, msg: String)
 
 object BooleanResult {
   class MyBooleanLogic[T](x: Option[T], origin: T) {
@@ -36,7 +40,7 @@ case class Undefined(val value: Int = -1) extends Result {
 }
 
 //Node hierarchy
-sealed trait BaseNode {
+sealed trait BaseNode extends Positional{
   def evaluate(): Result
 }
 sealed trait Expression extends BaseNode
@@ -44,9 +48,9 @@ sealed trait Operation extends BaseNode
 
 //Concrete Nodes
 case class Program(expressions: List[BaseNode])
-case class Apply(function: Lambda, expression: Expression) extends Operation {
+case class Apply(function: Lambda, expression: BaseNode) extends Operation {
   def evaluate(): Result = {
-    return new Lambda(function.x, Some(expression)).evaluate()
+    return new Lambda(function.x, expression).evaluate()
   }
 }
 case class Choose(left: Expression, right: Expression) extends Operation {
@@ -85,6 +89,13 @@ case class StrExpression(value: String) extends Expression {
   def evaluate: Result = new Undefined
 }
 
+object VarExpression {
+  def apply(name: String): VarExpression = VarExpression(name, Scope.TOP)
+}
+case class VarExpression(name: String, scope: Scope) extends Expression {
+  def evaluate(): Result = new ValidResult(0)
+}
+
 case class IntExpression(value: Int) extends Expression {
   def evaluate(): Result = value match {
     case 0 => new ValidResult(0)
@@ -93,9 +104,9 @@ case class IntExpression(value: Int) extends Expression {
   }
 
 }
-case class Lambda(x: BaseNode, e: Option[BaseNode]) extends BaseNode {
+case class Lambda(x: VarExpression, e: BaseNode) extends BaseNode {
   def evaluate(): Result = {
-    val evaluated = e.get.evaluate()
+    val evaluated = e.evaluate()
     if (evaluated == Undefined())
       return Undefined()
     evaluated union (evaluated ||| Undefined())

@@ -11,8 +11,10 @@ trait QLanguageParser extends RegexParsers {
   protected lazy val sentence: Parser[BaseNode] = function | minus | choose | apply | numeral | alt_numeral | expression
 
   //expressions
+  protected lazy val variable = charExpression ^^ VarExpression.apply
   protected lazy val expression: Parser[Expression] = numericExpression | stringExpression
   protected lazy val numericExpression = "[0-9_]+".r ^^ { e => IntExpression(e.toInt) }
+  protected lazy val charExpression = "[a-zA-Z_]".r
   protected lazy val stringExpression = "[a-zA-Z_]+".r ^^ StrExpression
 
   //Operations
@@ -23,7 +25,7 @@ trait QLanguageParser extends RegexParsers {
   protected lazy val numeral = "numeral?" ~> sentence ^^ Query
 
   //lambda
-  protected lazy val function = "lambda" ~> expression ~ '.' ~ expression.? ^^ { case x ~ '.' ~ e => Lambda(x, e) }
+  protected lazy val function = ("lambda" | "λ") ~> variable ~ '.' ~ sentence ^^ { case x ~ '.' ~ e => Lambda(x, e) }
 
   def apply(input: String) = parseAll(program, input) match {
     case Success(result, _) => result

@@ -34,6 +34,10 @@ class QParserTest extends FreeSpec with Matchers with QLanguageParser {
       "for a multiple line operation" in {
         apply(""" @(1-0) choose(2,5)""") should be(Program(List(Query(Minus(IntExpression(1),IntExpression(0))), Choose(IntExpression(2),IntExpression(5)))))
       }
+      
+      "Lambda parsing" in {
+        apply(""" lambda x.(x - x)(0-1)""") should be(Program(List(Lambda(VarExpression("x"),Minus(StrExpression("x"),StrExpression("x"))), Minus(IntExpression(0),IntExpression(1)))))
+      }
     }
 
   }
